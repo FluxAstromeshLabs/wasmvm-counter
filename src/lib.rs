@@ -1,9 +1,6 @@
-use std::result;
-
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::{
-    entry_point, from_json, to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response,
-    StdError, StdResult,
+    entry_point, from_json, to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult,
 };
 use serde::{Deserialize, Serialize};
 
@@ -67,6 +64,5 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
             let counter: Counter = from_json(&bz).unwrap();
             return to_json_binary(&counter);
         }
-        _ => unreachable!(),
     };
 }
