@@ -1,7 +1,10 @@
-use cosmwasm_std::{
-    entry_point, from_json, to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult,
-};
+use std::result;
+
 use cosmwasm_schema::{cw_serde, QueryResponses};
+use cosmwasm_std::{
+    entry_point, from_json, to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response,
+    StdError, StdResult,
+};
 use serde::{Deserialize, Serialize};
 
 #[cw_serde]
@@ -9,12 +12,15 @@ pub struct InstantiateMsg {}
 
 #[cw_serde]
 pub enum ExecuteMsg {
-    Count,
+    Count {},
 }
 
 #[cw_serde]
 #[derive(QueryResponses)]
-pub enum QueryMsg {}
+pub enum QueryMsg {
+    #[returns(i32)]
+    Value {},
+}
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct Counter {
@@ -45,17 +51,22 @@ pub fn execute(
     let bz = deps.storage.get(COUNTER_KEY).unwrap();
     let mut counter: Counter = from_json(&bz).unwrap();
     match msg {
-        ExecuteMsg::Count => {
+        ExecuteMsg::Count {} => {
             counter.value += 1;
-        },
+        }
     };
     deps.storage.set(COUNTER_KEY, &to_json_binary(&counter)?);
     Ok(Response::new().add_attribute("method", "execute"))
 }
 
 #[entry_point]
-pub fn query(deps: Deps, _env: Env, _msg: QueryMsg) -> StdResult<Binary> {
-    let bz = deps.storage.get(COUNTER_KEY).unwrap();
-    let counter: Counter = from_json(&bz).unwrap();
-    to_json_binary(&counter)
+pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
+    match msg {
+        QueryMsg::Value {} => {
+            let bz = deps.storage.get(COUNTER_KEY).unwrap();
+            let counter: Counter = from_json(&bz).unwrap();
+            return to_json_binary(&counter);
+        }
+        _ => unreachable!(),
+    };
 }
