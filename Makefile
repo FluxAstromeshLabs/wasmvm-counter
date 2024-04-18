@@ -1,5 +1,5 @@
 build:
-	@cargo build --target wasm32-unknown-unknown
+	@cargo build --lib --target wasm32-unknown-unknown
 
 build-release:
-	@cargo build --target wasm32-unknown-unknown --release
+	@cargo build --lib --target wasm32-unknown-unknown --release
